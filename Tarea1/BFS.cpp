@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
-
+#include <chrono>
 using namespace std;
 
 struct Nodo {
@@ -16,7 +16,7 @@ struct Nodo {
 int movX[8] = {0, 0, -1, 1, -1, 1, -1, 1};
 int movY[8] = {-1, 1, 0, 0, -1, -1, 1, 1};
 
-// Cambiamos "map" a "mapa" para evitar colisiones con std::map
+
 void BFS(vector<vector<int>>& mapa, Nodo start, Nodo end)
 {
     int height = mapa.size();
@@ -70,7 +70,7 @@ void BFS(vector<vector<int>>& mapa, Nodo start, Nodo end)
 
     if(crossTheFinish)
     {
-        // Uso std::cout por si tu editor sigue con el bug visual de ambigüedad
+       
         std::cout << "BFS encontro la salida!" << std::endl;
         std::cout << "Nodos revisados: " << expandedNodes << std::endl;
 
@@ -79,7 +79,7 @@ void BFS(vector<vector<int>>& mapa, Nodo start, Nodo end)
         while(!(current.x == start.x && current.y == start.y))
         {
             finalPath.push_back(current);
-            // Recuperamos usando [y][x]
+            
             current = parent[current.y][current.x];
         }
         finalPath.push_back(start);
@@ -87,7 +87,7 @@ void BFS(vector<vector<int>>& mapa, Nodo start, Nodo end)
         reverse(finalPath.begin(), finalPath.end());
 
         double pathLength = 0.0;
-        // El for debe empezar en 0 para contar el primer paso
+        
         for(size_t i = 0; i < finalPath.size() - 1; i++) 
         {
             // Usar abs() para evitar que movimientos negativos arruinen el cálculo
@@ -109,7 +109,91 @@ void BFS(vector<vector<int>>& mapa, Nodo start, Nodo end)
         std::cout << "No se encontro un camino." << std::endl;
     }
 }
+void BFS_Alturas(vector<vector<int>>& mapa, Nodo start, Nodo end)
+{
+    int height = mapa.size();
+    int width = mapa[0].size();
 
+    int expandedNodes = 0;
+    queue<Nodo> q;
+
+    vector<vector<bool>> visited(height, vector<bool>(width, false));
+    vector<vector<Nodo>> parent(height, vector<Nodo>(width, {-1, -1}));
+    
+    q.push(start);
+    visited[start.y][start.x] = true;
+
+    bool crossTheFinish = false;
+
+    while(!q.empty())
+    {
+        Nodo actual = q.front();
+        q.pop();
+
+        expandedNodes++;
+
+        if(actual.x == end.x && actual.y == end.y)
+        {
+            crossTheFinish = true;
+            break;
+        }
+
+        for(int i = 0; i < 8; i++) 
+        {
+            int newX = actual.x + movX[i];
+            int newY = actual.y + movY[i];
+
+            if(newX >= 0 && newX < width && newY >= 0 && newY < height)
+            {
+             
+                if(!visited[newY][newX]) 
+                {
+                    visited[newY][newX] = true;
+                    q.push({newX, newY});
+                    parent[newY][newX] = actual; 
+                }
+            }
+        }
+    }
+
+    if(crossTheFinish)
+    {
+        cout << "BFS encontro la salida!" << endl;
+        cout << "Nodos revisados: " << expandedNodes << endl;
+
+        vector<Nodo> finalPath;
+        Nodo current = end;
+        while(!(current.x == start.x && current.y == start.y))
+        {
+            finalPath.push_back(current);
+            current = parent[current.y][current.x];
+        }
+        finalPath.push_back(start);
+        
+        reverse(finalPath.begin(), finalPath.end());
+
+        double pathLength = 0.0;
+        
+        
+        for(size_t i = 0; i < finalPath.size() - 1; i++) 
+        {
+            Nodo actual = finalPath[i];
+            Nodo siguiente = finalPath[i+1];
+            
+            // Calculamos la diferencia de altura en valor absoluto
+            int altura_actual = mapa[actual.y][actual.x];
+            int altura_siguiente = mapa[siguiente.y][siguiente.x];
+            int diferencia_altura = abs(altura_actual - altura_siguiente);
+
+            
+            pathLength += diferencia_altura; 
+        }
+        cout << "Costo total del camino (diferencia de alturas): " << pathLength << endl;
+    } else
+    {
+        cout << "No se encontro un camino." << endl;
+    }
+}
 int main()
 {
     ifstream file("mapa.txt");
@@ -147,7 +231,32 @@ int main()
     std::cout << "Iniciando BFS...(" << start.x << "," << start.y << ") -> (" << end.x << "," << end.y << ")" << std::endl;
     
     // Y se la pasamos aquí
-    BFS(mapa, start, end);
+    //BFS(mapa, start, end);
+
+    int replays = 30;
+    double total_time_ms = 0.0;
+
+    
+    cout << "INICIANDO EXPERIMENTO: BFS" << endl;
+    cout << "Mapa: " << columns << "x" << rows << endl;
+    cout << "Repeticiones: " << replays << endl;
+    cout << "=========================================" << endl;
+
+
+    for(int i = 0; i < replays; i++)
+    {
+        auto strt_time = std::chrono::high_resolution_clock::now();
+        BFS(mapa, start, end);
+
+        auto end_time = std::chrono::high_resolution_clock::now();
+        chrono::duration<double, std::milli> tiempo_tomado = end_time - strt_time;
+        total_time_ms += tiempo_tomado.count();
+    }
+
+    double tiempo_promedio = total_time_ms / replays;
+    
+    cout << "\n--- RESULTADOS FINALES DEL EXPERIMENTO ---" << endl;
+    cout << "Tiempo Promedio de Ejecución: " << tiempo_promedio << " ms" << endl;
 
     return 0;
 }
