@@ -86,8 +86,7 @@ struct NodoAStar
                         //Si se encuentra un nodo mas barato hacia el vecino, lo actualizamos
                         if(new_G < cost_G[newY][newX])
                         {
-                            cost_G[newX][newY] = new_G;
-
+                            cost_G[newY][newX] = new_G;
                             double h_next = calculateHeuristica(newX, newY, end.x, end.y);
                             double new_F = new_G + (w * h_next);
                             
