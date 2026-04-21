@@ -332,8 +332,7 @@ int main()
 
     std::cout << "Iniciando BFS...(" << start.x << "," << start.y << ") -> (" << end.x << "," << end.y << ")" << std::endl;
     
-    // Y se la pasamos aquí
-    //BFS(mapa, start, end);
+   
 
     int replays = 30;
     double total_time_ms = 0.0;
@@ -358,7 +357,7 @@ int main()
     double  time_taken = total_time_ms / replays;
     
     cout << "\n--- RESULTADOS FINALES DEL EXPERIMENTO ---" << endl;
-    cout << "Tiempo Promedio de Ejecución: " << t time_taken<< " ms" << endl;
+    cout << "Tiempo Promedio de Ejecución: " << time_taken<< " ms" << endl;
 
     return 0;
 }
