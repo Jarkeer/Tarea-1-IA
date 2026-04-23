@@ -1,3 +1,4 @@
+Integrante: Javier Molina
 Para usar el programa se necesita ingresar el nombre del mapa + .txt al final, por ejemplo: random_big_map.txt
 
 Los mapas que se usaron para la experimentación fueron (están dentro del proyecto):
